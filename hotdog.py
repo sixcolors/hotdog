@@ -13,12 +13,10 @@ from keras.preprocessing import image
 import cv2
 
 # Global Variables
-image_width = 299
-image_height = 299
-batch_size=16
-num_epochs = 10
-steps_per_epoch = 100
-num_training_steps = 100
+image_width = 300
+image_height = 300
+batch_size=32
+num_epochs = 15
 
 def main():
     
@@ -85,24 +83,22 @@ def main():
     hotdog_images = os.listdir(hotdog_dir)
     nothotdog_images = os.listdir(nothotdog_dir)
 
-    # Shuffle the images
-    random.shuffle(hotdog_images)
-    random.shuffle(nothotdog_images)
+    # Create two separate lists for hotdog and not hotdog images
+    hotdog_images_labeled = [(os.path.join(hotdog_dir, img), 1) for img in hotdog_images]
+    nothotdog_images_labeled = [(os.path.join(nothotdog_dir, img), 0) for img in nothotdog_images]
 
-    # Combine the images into a single list
-    images = hotdog_images + nothotdog_images
+    # Combine the labeled images into a single list
+    images = hotdog_images_labeled + nothotdog_images_labeled
+
+    # Shuffle the images
+    random.shuffle(images)
 
     # Initialize the index to 0
     index = 0
 
     while True:
         # Load the image
-        test_image_path = images[index]
-        if test_image_path in hotdog_images:
-            img_dir = hotdog_dir
-        else:
-            img_dir = nothotdog_dir
-        test_image = load_img(os.path.join(img_dir, test_image_path), target_size=(image_width, image_height))
+        test_image = load_img(images[index][0], target_size=(image_width, image_height))
 
         # Convert the image to a numpy array
         test_image = img_to_array(test_image)
@@ -122,12 +118,12 @@ def main():
         else:
             prediction = 'not hotdog'
         print(f'Raw prediction: {result}')
-        print(f'The image {test_image_path} is a {prediction} with {result[0][0]} confidence')
+        print(f'The image {images[index][0]} is a {prediction} with {result[0][0]} confidence')
 
-        correct_prediction = (test_image_path in hotdog_images and prediction == 'hotdog') or (test_image_path in nothotdog_images and prediction == 'not hotdog')
+        correct_prediction = (prediction == 'hotdog' and images[index][1] == 1) or (prediction == 'not hotdog' and images[index][1] == 0)
 
         # Show the image (original jpg)
-        showImagePrediction(os.path.join(img_dir, test_image_path), prediction, result[0][0], correct_prediction)
+        showImagePrediction(images[index][0], prediction, result[0][0], correct_prediction)
 
         # Wait for user input
         key = cv2.waitKey(0)
@@ -149,7 +145,7 @@ def getModel():
     
     x = Flatten()(base_model.output)
     x = Dense(512, activation='relu')(x)
-    x = Dropout(0.5)(x)
+    x = Dropout(0.2)(x)
     x = Dense(1, activation='sigmoid')(x)
     
     model = tf.keras.models.Model(base_model.input, x)
@@ -164,11 +160,17 @@ def showImagePrediction(image_path, prediction, confidence, correct=True):
     img = cv2.imread(image_path)
 
     # Add the prediction label to the image
-    label = f"{prediction} ({confidence:.2f})"
+    if prediction == 'hotdog':
+        label = f"{prediction} ({confidence:.2f})"
+    else:
+        label = f"{prediction} ({1 - confidence:.2f})"
+
+    # Set the font color based on whether the prediction is correct or not
     if correct:
         font_color = (0, 255, 0)
     else:
         font_color = (0, 0, 255)
+
     cv2.putText(img, label, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 2)
 
     # Show the image
