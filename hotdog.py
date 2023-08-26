@@ -41,7 +41,7 @@ def main():
             target_size=(image_width, image_height),
             batch_size=16,
             class_mode='binary',
-            classes=['hotdog', 'nothotdog']
+            classes=['nothotdog', 'hotdog']
         )
 
         # Load the test set
@@ -52,7 +52,7 @@ def main():
             target_size=(image_width, image_height),
             batch_size=batch_size,
             class_mode='binary',
-            classes=['hotdog', 'nothotdog']
+            classes=['nothotdog', 'hotdog']
         )
 
         model = getModel()
