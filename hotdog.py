@@ -3,11 +3,11 @@ import sys
 import random
 import numpy as np
 import tensorflow as tf
-from tf.keras.models import Sequential
-from tf.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, BatchNormalization, Dropout
-from tf.keras.preprocessing.image import ImageDataGenerator
-from tf.keras.preprocessing import image
-from tf.keras.models import load_model as LoadModel
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, BatchNormalization, Dropout
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from keras.utils import load_img, img_to_array
+from tensorflow.keras.models import load_model as LoadModel
 import numpy as np
 from keras.preprocessing import image
 import cv2
@@ -102,10 +102,10 @@ def main():
             img_dir = hotdog_dir
         else:
             img_dir = nothotdog_dir
-        test_image = image.load_img(os.path.join(img_dir, test_image_path), target_size=(image_width, image_height))
+        test_image = load_img(os.path.join(img_dir, test_image_path), target_size=(image_width, image_height))
 
         # Convert the image to a numpy array
-        test_image = image.img_to_array(test_image)
+        test_image = img_to_array(test_image)
 
         # Normalize the image
         test_image /= 255.0
@@ -142,27 +142,20 @@ def main():
 
 
 def getModel():
-    # Model Definition
-    model = Sequential([
-        Conv2D(32, (3, 3), input_shape=(image_width, image_height, 3), activation='relu'),
-        BatchNormalization(),
-        MaxPooling2D(pool_size=(2, 2)),
-        Conv2D(64, (3, 3), activation='relu'),
-        BatchNormalization(),
-        MaxPooling2D(pool_size=(2, 2)),
-        Conv2D(128, (3, 3), activation='relu'),
-        BatchNormalization(),
-        MaxPooling2D(pool_size=(2, 2)),
-        Flatten(),
-        Dense(units=256, activation='leaky_relu'),
-        BatchNormalization(),
-        Dropout(0.3),
-        Dense(units=1, activation='sigmoid')
-    ])
-
-    # Model Compilation
-    model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
-
+    base_model = tf.keras.applications.VGG16(weights='imagenet', include_top=False, input_shape=(image_width, image_height, 3))
+    
+    for layer in base_model.layers:
+        layer.trainable = False  # Freeze the layers of the pre-trained model
+    
+    x = Flatten()(base_model.output)
+    x = Dense(512, activation='relu')(x)
+    x = Dropout(0.5)(x)
+    x = Dense(1, activation='sigmoid')(x)
+    
+    model = tf.keras.models.Model(base_model.input, x)
+    
+    model.compile(optimizer="adam", loss='binary_crossentropy', metrics=['accuracy'])
+    
     return model
 
 # Function to show the image with prediction label
