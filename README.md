@@ -22,7 +22,7 @@ The "Hotdog or Not Hotdog Classifier" project is an image classification applica
 - Grab the Dataset: https://www.kaggle.com/datasets/thedatasith/hotdog-nothotdog
     - Create a folder named "dataset"
     - Download the dataset and extract the images
-    - Move the test and train folders to the "dataset" folder.
+    - Move the "test" and "train" folders to the "dataset" folder.
 - Install the required dependencies listed in the requirements.txt file.
 - Run the main script to train the model or use a pre-trained model.
 - Interact with the model using the OpenCV-based interface to test random images.
