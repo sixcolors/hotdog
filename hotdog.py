@@ -66,7 +66,7 @@ def main():
         )
 
         # Evaluate the model
-        evaluation_results = model.evaluate_generator(validation_generator, steps=len(validation_generator))
+        evaluation_results = model.evaluate(validation_generator, steps=len(validation_generator))
         print("Evaluation results:")
         print(f"Loss: {evaluation_results[0]}")
         print(f"Accuracy: {evaluation_results[1]}")
