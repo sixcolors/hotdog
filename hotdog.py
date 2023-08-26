@@ -13,8 +13,8 @@ from keras.preprocessing import image
 import cv2
 
 # Global Variables
-image_width = 300
-image_height = 300
+image_width = 299
+image_height = 299
 batch_size=32
 num_epochs = 15
 
@@ -144,8 +144,8 @@ def getModel():
         layer.trainable = False  # Freeze the layers of the pre-trained model
     
     x = Flatten()(base_model.output)
-    x = Dense(512, activation='relu')(x)
-    x = Dropout(0.2)(x)
+    x = Dense(512, activation='leaky_relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(x)
+    x = Dropout(0.3)(x)
     x = Dense(1, activation='sigmoid')(x)
     
     model = tf.keras.models.Model(base_model.input, x)
