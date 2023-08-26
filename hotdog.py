@@ -146,6 +146,8 @@ def getModel():
     x = Flatten()(base_model.output)
     x = Dense(512, activation='leaky_relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(x)
     x = Dropout(0.3)(x)
+    x = Dense(256, activation='leaky_relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(x)
+    x = Dropout(0.2)(x)
     x = Dense(1, activation='sigmoid')(x)
     
     model = tf.keras.models.Model(base_model.input, x)
