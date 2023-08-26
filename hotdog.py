@@ -3,11 +3,11 @@ import sys
 import random
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, BatchNormalization, Dropout
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.models import load_model as LoadModel
+from tf.keras.models import Sequential
+from tf.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, BatchNormalization, Dropout
+from tf.keras.preprocessing.image import ImageDataGenerator
+from tf.keras.preprocessing import image
+from tf.keras.models import load_model as LoadModel
 import numpy as np
 from keras.preprocessing import image
 import cv2
@@ -121,6 +121,7 @@ def main():
             prediction = 'hotdog'
         else:
             prediction = 'not hotdog'
+        print(f'Raw prediction: {result}')
         print(f'The image {test_image_path} is a {prediction} with {result[0][0]} confidence')
 
         correct_prediction = (test_image_path in hotdog_images and prediction == 'hotdog') or (test_image_path in nothotdog_images and prediction == 'not hotdog')
