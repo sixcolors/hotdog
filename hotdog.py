@@ -35,7 +35,7 @@ def main():
         train_datagen = ImageDataGenerator(rescale=1./255, shear_range=0.2, zoom_range=0.2, horizontal_flip=True)
 
         train_generator = train_datagen.flow_from_directory(
-            'dataset/training_set',
+            'dataset/train',
             target_size=(image_width, image_height),
             batch_size=16,
             class_mode='binary',
@@ -46,7 +46,7 @@ def main():
         validation_datagen = ImageDataGenerator(rescale=1./255, shear_range=0.2, zoom_range=0.2, horizontal_flip=True)
 
         validation_generator = validation_datagen.flow_from_directory(
-            'dataset/test_set',
+            'dataset/test',
             target_size=(image_width, image_height),
             batch_size=batch_size,
             class_mode='binary',
@@ -76,8 +76,8 @@ def main():
         print(f'Model saved to {os.getcwd()}/hotdog.h5')
 
     # Load Test Image (random from test directory which has images in test/hotdog and test/nothotdog) and Predict
-    hotdog_dir = "dataset/test_set/hotdog"
-    nothotdog_dir = "dataset/test_set/nothotdog"
+    hotdog_dir = "dataset/test/hotdog"
+    nothotdog_dir = "dataset/test/nothotdog"
 
     # Load all images from the directories
     hotdog_images = os.listdir(hotdog_dir)

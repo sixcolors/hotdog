@@ -8,19 +8,25 @@ The "Hotdog or Not Hotdog Classifier" project is an image classification applica
 1. Binary classification: The model classifies images as either "Hotdog" or "Not Hotdog."
 2. Deep Learning Architecture: The project utilizes a CNN architecture for image feature extraction and classification.
 3. Data Preprocessing: Images are preprocessed and augmented using TensorFlow's ImageDataGenerator to improve model robustness.
-4. Training and Evaluation: The model is trained using a labeled dataset and evaluated on a separate test dataset to measure its accuracy.
+4. Training and Evaluation: The model is trained using a [labeled dataset](https://www.kaggle.com/datasets/thedatasith/hotdog-nothotdog) and evaluated on a separate test dataset to measure its accuracy.
 5. Model Saving: Trained models are saved in the Hierarchical Data Format (HDF5) format for future use and deployment.
 6. User Interaction: The application allows users to load random test images and view predictions, along with a confidence score, using OpenCV.
 7. Flexibility: The project includes customizable parameters such as image dimensions, batch size, and model architecture.
 8. GitHub Repository: The code and project files are hosted on GitHub for collaboration and version control.
 
-###Getting Started:
+### Getting Started:
 
 - Clone the repository to your local machine.
-- Grab a Dataset, try: https://www.kaggle.com/datasets/thedatasith/hotdog-nothotdog
+- Grab the Dataset: https://www.kaggle.com/datasets/thedatasith/hotdog-nothotdog
+    - Create a folder named "dataset"
+    - Download the dataset and extract the images
+    - Move the test and train folders to the "dataset" folder.
 - Install the required dependencies listed in the requirements.txt file.
 - Run the main script to train the model or use a pre-trained model.
 - Interact with the model using the OpenCV-based interface to test random images.
+    - Press "d" to view the next image.
+    - Press "a" to view the previous image.
+    - Press any other key to exit.
 
 ### Contributions:
 Contributions to the project are welcome! You can contribute by adding new features, improving model accuracy, enhancing user interaction, or optimizing the codebase. Feel free to open issues, fork the repository, and submit pull requests to collaborate with the community.
