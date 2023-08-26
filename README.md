@@ -33,7 +33,7 @@ The "Hotdog or Not Hotdog Classifier" project is an image classification applica
 ### Contributions:
 Contributions to the project are welcome! You can contribute by adding new features, improving model accuracy, enhancing user interaction, or optimizing the codebase. Feel free to open issues, fork the repository, and submit pull requests to collaborate with the community.
 
-###Acknowledgments:
+### Acknowledgments:
 This project is built on the foundation of deep learning, computer vision, and the TensorFlow library. It's a fun and educational demonstration of how machine learning can be applied to image classification tasks.
 
 ### Disclaimer:
