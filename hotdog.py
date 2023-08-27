@@ -1,4 +1,5 @@
 import os
+import platform
 import sys
 import random
 import numpy as np
@@ -16,7 +17,7 @@ import cv2
 image_width = 299
 image_height = 299
 batch_size=32
-num_epochs = 20
+num_epochs = 16
 
 def main():
     
@@ -138,21 +139,34 @@ def main():
 
 
 def getModel():
+    # Load a pre-trained VGG16 model without the top classification layer
     base_model = tf.keras.applications.VGG16(weights='imagenet', include_top=False, input_shape=(image_width, image_height, 3))
     
+    # Freeze the layers of the pre-trained model
     for layer in base_model.layers:
-        layer.trainable = False  # Freeze the layers of the pre-trained model
+        layer.trainable = False
     
+    # Add custom classification layers on top of the pre-trained model
     x = Flatten()(base_model.output)
-    x = Dense(512, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(x)
-    x = Dropout(0.3)(x)
-    x = Dense(256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(x)
-    x = Dropout(0.2)(x)
+    x = Dense(512, activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.25)(x)  # Experiment with dropout rate
+    x = Dense(256, activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.25)(x)  # Experiment with dropout rate
     x = Dense(1, activation='sigmoid')(x)
     
+    # Create the final model
     model = tf.keras.models.Model(base_model.input, x)
     
-    model.compile(optimizer="adam", loss='binary_crossentropy', metrics=['accuracy'])
+    # Use the Adam optimizer with a lower learning rate
+    if platform.machine() in ['arm64', 'arm64e']:
+        optimizer = tf.keras.optimizers.legacy.Adam(learning_rate=0.0001)
+    else:
+        optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
+    
+    # Compile the model with binary cross-entropy loss and accuracy metric
+    model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
     
     return model
 
