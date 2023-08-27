@@ -56,6 +56,9 @@ def main():
 
         model = getModel()
 
+        # Define the early stopping callback
+        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+
         # Train the model
         model.fit(
             train_generator,
@@ -63,7 +66,8 @@ def main():
             epochs=num_epochs,
             validation_data=validation_generator,
             validation_steps=validation_generator.samples // batch_size,
-            batch_size=batch_size
+            batch_size=batch_size,
+            callbacks=[early_stopping]
         )
 
         # Evaluate the model
