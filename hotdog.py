@@ -16,7 +16,7 @@ import cv2
 # Global Variables
 image_width = 299
 image_height = 299
-batch_size=32
+batch_size=16
 num_epochs = 20
 
 def main():
@@ -162,10 +162,13 @@ def getModel():
     x = Flatten()(base_model.output)
     x = Dense(512, activation='relu')(x)
     x = BatchNormalization()(x)
-    x = Dropout(0.25)(x)  # Experiment with dropout rate
+    x = Dropout(0.2)(x)  # Experiment with dropout rate
     x = Dense(256, activation='relu')(x)
     x = BatchNormalization()(x)
-    x = Dropout(0.25)(x)  # Experiment with dropout rate
+    x = Dropout(0.2)(x)  # Experiment with dropout rate
+    x = Dense(128, activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.2)(x)  # Experiment with dropout rate
     x = Dense(1, activation='sigmoid')(x)
     
     # Create the final model
