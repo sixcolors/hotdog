@@ -17,7 +17,7 @@ import cv2
 image_width = 299
 image_height = 299
 batch_size=32
-num_epochs = 16
+num_epochs = 20
 
 def main():
     
