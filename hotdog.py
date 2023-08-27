@@ -12,7 +12,8 @@ from tensorflow.keras.layers import (BatchNormalization, Conv2D, Dense,
                                      Dropout, Flatten, MaxPooling2D)
 from tensorflow.keras.models import Sequential, load_model as LoadModel
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, LearningRateScheduler
+from tensorflow.keras.utils import plot_model
 
 # Global Variables
 image_width = 299
@@ -71,11 +72,16 @@ def main():
         # Create the model
         model = getModel()
 
+        # Generate a visualization of the model architecture
+        plot_model(model, to_file='model_architecture.png', show_shapes=True, show_layer_names=True)
+        print("Model architecture visualization saved as 'model_architecture.png'")
+
         # Define the early stopping and model checkpoint callbacks
         early_stopping = EarlyStopping(monitor='val_loss', patience=3)
         model_checkpoint = ModelCheckpoint(
             'hotdog_checkpoint.h5', save_best_only=True)
-        
+        lr_scheduler = LearningRateScheduler(lr_schedule)
+
         # Train the model
         if os.path.exists('hotdog_checkpoint.h5'):
             # Load the weights from the checkpoint file
@@ -89,7 +95,7 @@ def main():
             validation_data=validation_generator,
             validation_steps=validation_generator.samples // batch_size,
             batch_size=batch_size,
-            callbacks=[early_stopping, model_checkpoint]
+            callbacks=[early_stopping, model_checkpoint, lr_scheduler]
         )
 
         # Evaluate the model
@@ -206,17 +212,34 @@ def getModel():
     # Create the final model
     model = tf.keras.models.Model(base_model.input, x)
 
-    # Use the Adam optimizer with a lower learning rate
+    # Use the Adam optimizer with an initial learning rate
+    initial_learning_rate = 0.0001
     if platform.machine() in ['arm64', 'arm64e']:
-        optimizer = tf.keras.optimizers.legacy.Adam(learning_rate=0.0001)
+        optimizer = tf.keras.optimizers.legacy.Adam(
+            learning_rate=initial_learning_rate)
     else:
-        optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
+        optimizer = tf.keras.optimizers.Adam(
+            learning_rate=initial_learning_rate)
 
     # Compile the model with binary cross-entropy loss and accuracy metric
     model.compile(optimizer=optimizer,
                   loss='binary_crossentropy', metrics=['accuracy'])
 
     return model
+
+
+def lr_schedule(epoch, initial_lr=0.0001):
+    '''
+    Learning Rate Scheduler
+    takes the epoch and initial learning rate as arguments
+    returns the learning rate for the epoch
+    '''
+    lr = initial_lr
+    if epoch > 10:
+        lr *= 0.1
+    elif epoch > 5:
+        lr *= 0.5
+    return lr
 
 
 def showImagePrediction(image_path, prediction, confidence, correct=True):
