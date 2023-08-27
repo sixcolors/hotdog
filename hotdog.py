@@ -1,35 +1,39 @@
 import os
 import platform
-import sys
 import random
+
+import cv2
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, BatchNormalization, Dropout
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from keras.utils import load_img, img_to_array
-from tensorflow.keras.models import load_model as LoadModel
-import numpy as np
 from keras.preprocessing import image
-import cv2
+from keras.utils import load_img, img_to_array
+from tensorflow.keras.layers import (BatchNormalization, Conv2D, Dense,
+                                     Dropout, Flatten, MaxPooling2D)
+from tensorflow.keras.models import Sequential, load_model as LoadModel
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Global Variables
 image_width = 299
 image_height = 299
-batch_size=16
+batch_size = 16
 num_epochs = 20
 
+
 def main():
-    
+    '''
+    Main function for Hotdog or Not Hotdog
+    Program will train a model to classify images as hotdog or not hotdog
+    If a model is provided as a command line argument, it will load the model and skip training
+    It will then load a random image from the test directory and predict if it is a hotdog or not hotdog
+    displaying the image and prediction label
+    '''
     # Check command line arguments
     if len(sys.argv) not in [1, 2]:
         print("Usage: python hotdog.py [model]")
         sys.exit(1)
-
     elif len(sys.argv) == 2:
         # Load the model
         model = LoadModel(sys.argv[1])
-
     else:
         # Part 1 - Data Preprocessing
         # Preprocessing the Training set
@@ -62,10 +66,12 @@ def main():
             classes=['nothotdog', 'hotdog']
         )
 
+        # Create the model
         model = getModel()
 
         # Define the early stopping callback
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+        early_stopping = tf.keras.callbacks.EarlyStopping(
+            monitor='val_loss', patience=3)
 
         # Train the model
         model.fit(
@@ -79,7 +85,8 @@ def main():
         )
 
         # Evaluate the model
-        evaluation_results = model.evaluate(validation_generator, steps=len(validation_generator))
+        evaluation_results = model.evaluate(
+            validation_generator, steps=len(validation_generator))
         print("Evaluation results:")
         print(f"Loss: {evaluation_results[0]}")
         print(f"Accuracy: {evaluation_results[1]}")
@@ -97,8 +104,10 @@ def main():
     nothotdog_images = os.listdir(nothotdog_dir)
 
     # Create two separate lists for hotdog and not hotdog images
-    hotdog_images_labeled = [(os.path.join(hotdog_dir, img), 1) for img in hotdog_images]
-    nothotdog_images_labeled = [(os.path.join(nothotdog_dir, img), 0) for img in nothotdog_images]
+    hotdog_images_labeled = [(os.path.join(hotdog_dir, img), 1)
+                             for img in hotdog_images]
+    nothotdog_images_labeled = [
+        (os.path.join(nothotdog_dir, img), 0) for img in nothotdog_images]
 
     # Combine the labeled images into a single list
     images = hotdog_images_labeled + nothotdog_images_labeled
@@ -111,7 +120,8 @@ def main():
 
     while True:
         # Load the image
-        test_image = load_img(images[index][0], target_size=(image_width, image_height))
+        test_image = load_img(
+            images[index][0], target_size=(image_width, image_height))
 
         # Convert the image to a numpy array
         test_image = img_to_array(test_image)
@@ -131,12 +141,16 @@ def main():
         else:
             prediction = 'not hotdog'
         print(f'Raw prediction: {result}')
-        print(f'The image {images[index][0]} is a {prediction} with {result[0][0]} confidence')
+        print(
+            f'The image {images[index][0]} is a {prediction} with {result[0][0]} confidence')
 
-        correct_prediction = (prediction == 'hotdog' and images[index][1] == 1) or (prediction == 'not hotdog' and images[index][1] == 0)
+        # Check if the prediction is correct
+        correct_prediction = (prediction == 'hotdog' and images[index][1] == 1) or (
+            prediction == 'not hotdog' and images[index][1] == 0)
 
-        # Show the image (original jpg)
-        showImagePrediction(images[index][0], prediction, result[0][0], correct_prediction)
+        # Show the image with the prediction label
+        showImagePrediction(images[index][0], prediction,
+                            result[0][0], correct_prediction)
 
         # Wait for user input
         key = cv2.waitKey(0)
@@ -151,15 +165,22 @@ def main():
 
 
 def getModel():
+    '''
+    returns a model with a VGG16 base model and custom classification layers
+    '''
     # Load a pre-trained VGG16 model without the top classification layer
-    base_model = tf.keras.applications.VGG16(weights='imagenet', include_top=False, input_shape=(image_width, image_height, 3))
-    
+    base_model = tf.keras.applications.VGG16(
+        weights='imagenet', include_top=False, input_shape=(image_width, image_height, 3))
+
     # Freeze the layers of the pre-trained model
     for layer in base_model.layers:
         layer.trainable = False
-    
+
     # Add custom classification layers on top of the pre-trained model
     x = Flatten()(base_model.output)
+    x = Dense(1024, activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.2)(x)  # Experiment with dropout rate
     x = Dense(512, activation='relu')(x)
     x = BatchNormalization()(x)
     x = Dropout(0.2)(x)  # Experiment with dropout rate
@@ -170,23 +191,28 @@ def getModel():
     x = BatchNormalization()(x)
     x = Dropout(0.2)(x)  # Experiment with dropout rate
     x = Dense(1, activation='sigmoid')(x)
-    
+
     # Create the final model
     model = tf.keras.models.Model(base_model.input, x)
-    
+
     # Use the Adam optimizer with a lower learning rate
     if platform.machine() in ['arm64', 'arm64e']:
         optimizer = tf.keras.optimizers.legacy.Adam(learning_rate=0.0001)
     else:
         optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
-    
+
     # Compile the model with binary cross-entropy loss and accuracy metric
-    model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
-    
+    model.compile(optimizer=optimizer,
+                  loss='binary_crossentropy', metrics=['accuracy'])
+
     return model
 
-# Function to show the image with prediction label
+
 def showImagePrediction(image_path, prediction, confidence, correct=True):
+    '''
+    Displays the image with the prediction label
+    takes the image path, prediction label, confidence, and whether the prediction is correct as arguments
+    '''
     # Load the image
     img = cv2.imread(image_path)
 
@@ -202,10 +228,12 @@ def showImagePrediction(image_path, prediction, confidence, correct=True):
     else:
         font_color = (0, 0, 255)
 
-    cv2.putText(img, label, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 2)
+    cv2.putText(img, label, (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 2)
 
     # Show the image
     cv2.imshow("Image", img)
+
 
 if __name__ == "__main__":
     main()
