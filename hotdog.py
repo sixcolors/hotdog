@@ -228,10 +228,10 @@ def getModel():
     return model
 
 
-def lr_schedule(epoch, initial_lr=0.001):
+def lr_schedule(epoch, initial_lr=0.001, min_lr=1e-6, max_lr=1e-3):
     '''
     Learning Rate Scheduler
-    takes the epoch and initial learning rate as arguments
+    takes the epoch, initial learning rate, minimum learning rate, and maximum learning rate as arguments
     returns the learning rate for the epoch
     '''
     lr = initial_lr
@@ -239,6 +239,8 @@ def lr_schedule(epoch, initial_lr=0.001):
         lr *= 0.1
     elif epoch > 5:
         lr *= 0.5
+    lr = max(lr, min_lr)
+    lr = min(lr, max_lr)
     return lr
 
 
