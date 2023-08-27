@@ -12,6 +12,7 @@ from tensorflow.keras.layers import (BatchNormalization, Conv2D, Dense,
                                      Dropout, Flatten, MaxPooling2D)
 from tensorflow.keras.models import Sequential, load_model as LoadModel
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 # Global Variables
 image_width = 299
@@ -70,9 +71,15 @@ def main():
         # Create the model
         model = getModel()
 
-        # Define the early stopping callback
-        early_stopping = tf.keras.callbacks.EarlyStopping(
-            monitor='val_loss', patience=3)
+        # Define the early stopping and model checkpoint callbacks
+        early_stopping = EarlyStopping(monitor='val_loss', patience=3)
+        model_checkpoint = ModelCheckpoint(
+            'hotdog_checkpoint.h5', save_best_only=True)
+        
+        # Train the model
+        if os.path.exists('hotdog_checkpoint.h5'):
+            # Load the weights from the checkpoint file
+            model.load_weights('hotdog_checkpoint.h5')
 
         # Train the model
         model.fit(
@@ -82,7 +89,7 @@ def main():
             validation_data=validation_generator,
             validation_steps=validation_generator.samples // batch_size,
             batch_size=batch_size,
-            callbacks=[early_stopping]
+            callbacks=[early_stopping, model_checkpoint]
         )
 
         # Evaluate the model
@@ -92,7 +99,7 @@ def main():
         print(f"Loss: {evaluation_results[0]}")
         print(f"Accuracy: {evaluation_results[1]}")
 
-        # Save the model
+        # Save the final model
         model.save("hotdog.h5")
         print(f'Model saved to {os.getcwd()}/hotdog.h5')
 
