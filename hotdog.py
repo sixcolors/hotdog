@@ -195,9 +195,6 @@ def getModel():
 
     # Add custom classification layers on top of the pre-trained model
     x = Flatten()(base_model.output)
-    x = Dense(1024, activation='relu')(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.2)(x)  # Experiment with dropout rate
     x = Dense(512, activation='relu')(x)
     x = BatchNormalization()(x)
     x = Dropout(0.2)(x)  # Experiment with dropout rate
@@ -205,6 +202,9 @@ def getModel():
     x = BatchNormalization()(x)
     x = Dropout(0.2)(x)  # Experiment with dropout rate
     x = Dense(128, activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.2)(x)  # Experiment with dropout rate
+    x = Dense(64, activation='relu')(x)
     x = BatchNormalization()(x)
     x = Dropout(0.2)(x)  # Experiment with dropout rate
     x = Dense(1, activation='sigmoid')(x)
