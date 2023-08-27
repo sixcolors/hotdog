@@ -77,7 +77,7 @@ def main():
         print("Model architecture visualization saved as 'model_architecture.png'")
 
         # Define the early stopping and model checkpoint callbacks
-        early_stopping = EarlyStopping(monitor='val_loss', patience=3)
+        early_stopping = EarlyStopping(monitor='val_loss', patience=5)
         model_checkpoint = ModelCheckpoint(
             'hotdog_checkpoint.h5', save_best_only=True)
         lr_scheduler = LearningRateScheduler(lr_schedule)
@@ -85,6 +85,7 @@ def main():
         # Train the model
         if os.path.exists('hotdog_checkpoint.h5'):
             # Load the weights from the checkpoint file
+            print("Loading weights from 'hotdog_checkpoint.h5'")
             model.load_weights('hotdog_checkpoint.h5')
 
         # Train the model
