@@ -213,7 +213,7 @@ def getModel():
     model = tf.keras.models.Model(base_model.input, x)
 
     # Use the Adam optimizer with an initial learning rate
-    initial_learning_rate = 0.0001
+    initial_learning_rate = 0.001
     if platform.machine() in ['arm64', 'arm64e']:
         optimizer = tf.keras.optimizers.legacy.Adam(
             learning_rate=initial_learning_rate)
@@ -228,7 +228,7 @@ def getModel():
     return model
 
 
-def lr_schedule(epoch, initial_lr=0.0001):
+def lr_schedule(epoch, initial_lr=0.001):
     '''
     Learning Rate Scheduler
     takes the epoch and initial learning rate as arguments
