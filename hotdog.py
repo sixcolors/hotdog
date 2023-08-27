@@ -33,18 +33,26 @@ def main():
     else:
         # Part 1 - Data Preprocessing
         # Preprocessing the Training set
-        train_datagen = ImageDataGenerator(rescale=1./255, shear_range=0.2, zoom_range=0.2, horizontal_flip=True)
+        train_datagen = ImageDataGenerator(
+            rescale=1./255,
+            rotation_range=20,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            shear_range=0.2,
+            zoom_range=0.2,
+            horizontal_flip=True
+        )
 
         train_generator = train_datagen.flow_from_directory(
             'dataset/train',
             target_size=(image_width, image_height),
-            batch_size=16,
+            batch_size=batch_size,
             class_mode='binary',
             classes=['nothotdog', 'hotdog']
         )
 
         # Load the test set
-        validation_datagen = ImageDataGenerator(rescale=1./255, shear_range=0.2, zoom_range=0.2, horizontal_flip=True)
+        validation_datagen = ImageDataGenerator(rescale=1./255)
 
         validation_generator = validation_datagen.flow_from_directory(
             'dataset/test',
