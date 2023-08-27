@@ -165,3 +165,6 @@ dataset/
 
 ### Model ###
 *.h5
+
+### Model Architecture png ###
+model_architecture.png
