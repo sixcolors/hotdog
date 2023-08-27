@@ -1,4 +1,5 @@
 import os
+import sys
 import platform
 import random
 
@@ -111,6 +112,9 @@ def main():
 
     # Combine the labeled images into a single list
     images = hotdog_images_labeled + nothotdog_images_labeled
+
+    # Seed the random number generator
+    random.seed()
 
     # Shuffle the images
     random.shuffle(images)
