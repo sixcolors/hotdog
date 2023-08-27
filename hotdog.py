@@ -8,12 +8,13 @@ import numpy as np
 import tensorflow as tf
 from keras.preprocessing import image
 from keras.utils import load_img, img_to_array
-from tensorflow.keras.layers import (BatchNormalization, Conv2D, Dense,
-                                     Dropout, Flatten, MaxPooling2D)
-from tensorflow.keras.models import Sequential, load_model as LoadModel
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, LearningRateScheduler
-from tensorflow.keras.utils import plot_model
+from keras.layers import (BatchNormalization, Dense,
+                                     Dropout, GlobalAveragePooling2D, LeakyReLU)
+from keras.regularizers import l2
+from keras.models import load_model as LoadModel
+from keras.preprocessing.image import ImageDataGenerator
+from keras.callbacks import EarlyStopping, ModelCheckpoint, LearningRateScheduler
+from keras.utils import plot_model
 
 # Global Variables
 image_width = 299
@@ -73,20 +74,21 @@ def main():
         model = getModel()
 
         # Generate a visualization of the model architecture
-        plot_model(model, to_file='model_architecture.png', show_shapes=True, show_layer_names=True)
+        plot_model(model, to_file='model_architecture.png',
+                   show_shapes=True, show_layer_names=True)
         print("Model architecture visualization saved as 'model_architecture.png'")
 
         # Define the early stopping and model checkpoint callbacks
         early_stopping = EarlyStopping(monitor='val_loss', patience=5)
         model_checkpoint = ModelCheckpoint(
-            'hotdog_checkpoint.h5', save_best_only=True)
+            'hotdog_checkpoint.keras', save_best_only=True)
         lr_scheduler = LearningRateScheduler(lr_schedule)
 
         # Train the model
-        if os.path.exists('hotdog_checkpoint.h5'):
+        if os.path.exists('hotdog_checkpoint.keras'):
             # Load the weights from the checkpoint file
-            print("Loading weights from 'hotdog_checkpoint.h5'")
-            model.load_weights('hotdog_checkpoint.h5')
+            print("Loading weights from 'hotdog_checkpoint.keras'")
+            model.load_weights('hotdog_checkpoint.keras')
 
         # Train the model
         model.fit(
@@ -107,8 +109,8 @@ def main():
         print(f"Accuracy: {evaluation_results[1]}")
 
         # Save the final model
-        model.save("hotdog.h5")
-        print(f'Model saved to {os.getcwd()}/hotdog.h5')
+        model.save("hotdog.keras")
+        print(f'Model saved to {os.getcwd()}/hotdog.keras')
 
     # Load Test Image (random from test directory which has images in test/hotdog and test/nothotdog) and Predict
     hotdog_dir = "dataset/test/hotdog"
@@ -195,31 +197,27 @@ def getModel():
         layer.trainable = False
 
     # Add custom classification layers on top of the pre-trained model
-    x = Flatten()(base_model.output)
-    x = Dense(512, activation='relu')(x)
+    x = GlobalAveragePooling2D()(base_model.output)
+    x = Dense(256, kernel_regularizer=l2(0.01))(x)
+    x = LeakyReLU(alpha=0.1)(x)
     x = BatchNormalization()(x)
-    x = Dropout(0.2)(x)  # Experiment with dropout rate
-    x = Dense(256, activation='relu')(x)
+    x = Dropout(0.3)(x)
+    x = Dense(128, kernel_regularizer=l2(0.01))(x)
+    x = LeakyReLU(alpha=0.1)(x)
     x = BatchNormalization()(x)
-    x = Dropout(0.2)(x)  # Experiment with dropout rate
-    x = Dense(128, activation='relu')(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.2)(x)  # Experiment with dropout rate
-    x = Dense(64, activation='relu')(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.2)(x)  # Experiment with dropout rate
+    x = Dropout(0.3)(x)
     x = Dense(1, activation='sigmoid')(x)
 
     # Create the final model
     model = tf.keras.models.Model(base_model.input, x)
 
-    # Use the Adam optimizer with an initial learning rate
+    # Use the RMSProp optimizer with an initial learning rate
     initial_learning_rate = 0.001
     if platform.machine() in ['arm64', 'arm64e']:
-        optimizer = tf.keras.optimizers.legacy.Adam(
+        optimizer = tf.keras.optimizers.legacy.RMSprop(
             learning_rate=initial_learning_rate)
     else:
-        optimizer = tf.keras.optimizers.Adam(
+        optimizer = tf.keras.optimizers.RMSprop(
             learning_rate=initial_learning_rate)
 
     # Compile the model with binary cross-entropy loss and accuracy metric

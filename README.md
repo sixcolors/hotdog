@@ -8,19 +8,16 @@ The "Hotdog or Not Hotdog Classifier" project is an image classification applica
 ### Key Features:
 
 1. Binary classification: The model classifies images as either "Hotdog" or "Not Hotdog."
-2. Deep Learning Architecture: The project utilizes a CNN architecture for image feature extraction and classification.
+2. Deep Learning Architecture: The project utilizes a CNN architecture with a VGG16 base model and custom classification layers for image feature extraction and classification.
 3. Data Preprocessing: Images are preprocessed and augmented using TensorFlow's ImageDataGenerator to improve model robustness.
-4. Training and Evaluation: The model is trained using a [labeled dataset](https://www.kaggle.com/datasets/thedatasith/hotdog-nothotdog) and evaluated on a separate test dataset to measure its accuracy.
-5. Early Stopping and Model Checkpointing: The model is trained using early stopping and model checkpointing to prevent overfitting and save the best model weights.
-6. Learning Rate Scheduling: The learning rate is scheduled to gradually decrease during training to improve performance.
+4. Regularization Techniques: The model uses L2 regularization and dropout to prevent overfitting and improve generalization performance.
+5. Learning Rate Scheduling: The learning rate is scheduled to gradually decrease during training to improve performance.
+6. Training and Evaluation: The model is trained using a labeled dataset and evaluated on a separate test dataset to measure its accuracy. Early stopping and model checkpointing are used to prevent overfitting and save the best model weights.
 7. Model Loading and Prediction: The code includes a main function that loads a trained model (if provided) and predicts the class of a random image from the test directory.
 8. Command Line Arguments: The code includes command line argument parsing to specify the path to a pre-trained model.
 9. Code Documentation: The code includes comments and docstrings to explain the purpose and functionality of each section of code.
-10. Installation and Usage Instructions: The README.md file includes instructions for installing dependencies and running the code.
-11. Model Training and Prediction Instructions: The README.md file includes instructions for training a new model and using a pre-trained model for prediction.
-12. Model Saving: Trained models are saved in the Hierarchical Data Format (HDF5) format for future use and deployment.
-13. Flexibility: The project includes customizable parameters such as image dimensions, batch size, and model architecture.
-14. GitHub Repository: The code and project files are hosted on GitHub for collaboration and version control.
+11. Model Saving: Trained models are saved in the Hierarchical Data Format (HDF5) format for future use and deployment.
+12. Flexibility: The project includes customizable parameters such as image dimensions, batch size, and model architecture.
 
 ### Getting Started:
 
