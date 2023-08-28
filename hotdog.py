@@ -134,7 +134,7 @@ def main():
     random.seed()
 
     # Shuffle the images
-    random.shuffle(images)
+    random.shuffle(images) # Devskim: ignore DS148264
 
     # Initialize the index to 0
     index = 0
