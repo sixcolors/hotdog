@@ -81,14 +81,14 @@ def main():
         # Define the early stopping and model checkpoint callbacks
         early_stopping = EarlyStopping(monitor='val_loss', patience=5)
         model_checkpoint = ModelCheckpoint(
-            'hotdog_checkpoint.keras', save_best_only=True)
+            'hotdog_checkpoint.h5', save_best_only=True)
         lr_scheduler = LearningRateScheduler(lr_schedule)
 
         # Train the model
-        if os.path.exists('hotdog_checkpoint.keras'):
+        if os.path.exists('hotdog_checkpoint.h5'):
             # Load the weights from the checkpoint file
-            print("Loading weights from 'hotdog_checkpoint.keras'")
-            model.load_weights('hotdog_checkpoint.keras')
+            print("Loading weights from 'hotdog_checkpoint.h5'")
+            model.load_weights('hotdog_checkpoint.h5')
 
         # Train the model
         model.fit(
@@ -109,8 +109,8 @@ def main():
         print(f"Accuracy: {evaluation_results[1]}")
 
         # Save the final model
-        model.save("hotdog.keras")
-        print(f'Model saved to {os.getcwd()}/hotdog.keras')
+        model.save("hotdog.h5")
+        print(f'Model saved to {os.getcwd()}/hotdog.h5')
 
     # Load Test Image (random from test directory which has images in test/hotdog and test/nothotdog) and Predict
     hotdog_dir = "dataset/test/hotdog"
