@@ -9,9 +9,9 @@ import tensorflow as tf
 from keras.preprocessing import image
 from keras.utils import load_img, img_to_array
 from keras.layers import (BatchNormalization, Dense,
-                                     Dropout, GlobalAveragePooling2D, LeakyReLU)
+                          Dropout, GlobalAveragePooling2D)
 from keras.regularizers import l2
-from keras.models import load_model as LoadModel
+from keras.models import (load_model as LoadModel, Model)
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import EarlyStopping, ModelCheckpoint, LearningRateScheduler
 from keras.utils import plot_model
@@ -198,20 +198,18 @@ def getModel():
 
     # Add custom classification layers on top of the pre-trained model
     x = GlobalAveragePooling2D()(base_model.output)
-    x = Dense(256, kernel_regularizer=l2(0.01))(x)
-    x = LeakyReLU(alpha=0.1)(x)
+    x = Dense(128, activation='relu', kernel_regularizer=l2(0.01))(x)
     x = BatchNormalization()(x)
-    x = Dropout(0.3)(x)
-    x = Dense(128, kernel_regularizer=l2(0.01))(x)
-    x = LeakyReLU(alpha=0.1)(x)
+    x = Dropout(0.5)(x)
+    x = Dense(64, activation='relu', kernel_regularizer=l2(0.01))(x)
     x = BatchNormalization()(x)
-    x = Dropout(0.3)(x)
-    x = Dense(1, activation='sigmoid')(x)
+    x = Dropout(0.5)(x)
+    prediction = Dense(1, activation='sigmoid')(x)
 
     # Create the final model
-    model = tf.keras.models.Model(base_model.input, x)
+    model = Model(inputs=base_model.input, outputs=prediction)
 
-    # Use the RMSProp optimizer with an initial learning rate
+    # Use the RMSprop optimizer with an initial learning rate
     initial_learning_rate = 0.001
     if platform.machine() in ['arm64', 'arm64e']:
         optimizer = tf.keras.optimizers.legacy.RMSprop(
@@ -221,8 +219,8 @@ def getModel():
             learning_rate=initial_learning_rate)
 
     # Compile the model with binary cross-entropy loss and accuracy metric
-    model.compile(optimizer=optimizer,
-                  loss='binary_crossentropy', metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy',
+                  optimizer=optimizer, metrics=['accuracy'])
 
     return model
 
