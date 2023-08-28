@@ -198,12 +198,9 @@ def getModel():
 
     # Add custom classification layers on top of the pre-trained model
     x = GlobalAveragePooling2D()(base_model.output)  # apply global average pooling to reduce the spatial dimensions of the feature maps
-    x = Dense(128, activation='relu', kernel_regularizer=l2(0.01))(x)  # apply a linear transformation to the feature vector and apply the ReLU activation function
+    x = Dense(1024, activation='leaky_relu', kernel_regularizer=l2(0.01))(x)  # apply a linear transformation to the feature vector and apply the ReLU activation function
     x = BatchNormalization()(x)  # apply batch normalization to improve the stability and speed of training
-    x = Dropout(0.5)(x)  # apply dropout regularization to prevent overfitting to the training data
-    x = Dense(64, activation='relu', kernel_regularizer=l2(0.01))(x)  # apply another linear transformation to the feature vector and apply the ReLU activation function
-    x = BatchNormalization()(x)  # apply batch normalization again
-    x = Dropout(0.5)(x)  # apply dropout regularization again
+    x = Dropout(0.3)(x)  # apply dropout regularization to prevent overfitting to the training data
     prediction = Dense(1, activation='sigmoid')(x)  # apply a final linear transformation and sigmoid activation function to produce the final output of the model
 
     # Create the final model
@@ -252,20 +249,42 @@ def showImagePrediction(image_path, prediction, confidence, correct=True):
     # Add the prediction label to the image
     if prediction == 'hotdog':
         label = f"{prediction} ({confidence:.2f})"
+        bg_color = (0, 255, 0)  # green background for hotdog prediction
+        symbol = '✓' if correct else 'X'  # checkmark for correct prediction, X for incorrect prediction
     else:
         label = f"{prediction} ({1 - confidence:.2f})"
+        bg_color = (0, 0, 255)  # red background for not hotdog prediction
+        symbol = 'X' if correct else '✓'  # X for incorrect prediction, checkmark for correct prediction
 
-    # Set the font color based on whether the prediction is correct or not
-    if correct:
-        font_color = (0, 255, 0)
+    # Set the font color to white
+    font_color = (255, 255, 255)
+
+    # Get the size of the image and the prediction label
+    img_height, img_width, _ = img.shape
+    label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+
+    # Calculate the position of the prediction label
+    label_x = 10
+    label_y = 10 + label_size[1]
+
+    # Resize the prediction label to match the width of the image
+    if label_size[0] > img_width - 20:
+        scale_factor = (img_width - 20) / label_size[0]
+        label_size = (int(label_size[0] * scale_factor),
+                      int(label_size[1] * scale_factor))
     else:
-        font_color = (0, 0, 255)
+        scale_factor = 1
 
-    cv2.putText(img, label, (10, 30),
+    # Add the prediction label to the image with a colored background and symbol
+    cv2.rectangle(img, (label_x, label_y - label_size[1]),
+                  (label_x + label_size[0], label_y), bg_color, -1)
+    cv2.putText(img, label, (label_x, label_y),
+                cv2.FONT_HERSHEY_SIMPLEX, scale_factor, font_color, 2)
+    cv2.putText(img, symbol, (label_x + label_size[0] - 30, label_y - 10),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 2)
 
     # Show the image
-    cv2.imshow("Image", img)
+    cv2.imshow("Hotdog or Not Hotdog", img)
 
 
 if __name__ == "__main__":
