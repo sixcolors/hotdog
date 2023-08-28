@@ -8,7 +8,7 @@ The "Hotdog or Not Hotdog Classifier" project is an image classification applica
 ### Key Features:
 
 1. Binary classification: The model classifies images as either "Hotdog" or "Not Hotdog."
-2. Deep Learning Architecture: The project utilizes a CNN architecture with a VGG16 base model and custom classification layers for image feature extraction and classification.
+2. Deep Learning Architecture: The project utilizes a CNN architecture with a InceptionV3 base model and custom classification layers for image feature extraction and classification.
 3. Data Preprocessing: Images are preprocessed and augmented using TensorFlow's ImageDataGenerator to improve model robustness.
 4. Regularization Techniques: The model uses L2 regularization and dropout to prevent overfitting and improve generalization performance.
 5. Learning Rate Scheduling: The learning rate is scheduled to gradually decrease during training to improve performance.
@@ -32,6 +32,10 @@ The "Hotdog or Not Hotdog Classifier" project is an image classification applica
     - Press "d" to view the next image.
     - Press "a" to view the previous image.
     - Press any other key to exit.
+- The image will be classified as "Hotdog" or "Not Hotdog."
+    - The label will be displayed below the image with the confidence score.
+    - The label will have a green background if the image is classified as "Hotdog" and a red background if it's classified as "Not Hotdog."
+    - A checkmark will be displayed above the label if the prediction is correct and an "X" will be displayed if it's incorrect.
 
 ### Contributions:
 Contributions to the project are welcome! You can contribute by adding new features, improving model accuracy, enhancing user interaction, or optimizing the codebase. Feel free to open issues, fork the repository, and submit pull requests to collaborate with the community.

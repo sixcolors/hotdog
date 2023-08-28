@@ -12,6 +12,7 @@ from keras.layers import (BatchNormalization, Dense,
                           Dropout, GlobalAveragePooling2D)
 from keras.regularizers import l2
 from keras.models import (load_model as LoadModel, Model)
+from keras.applications.inception_v3 import InceptionV3
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import EarlyStopping, ModelCheckpoint, LearningRateScheduler
 from keras.utils import plot_model
@@ -183,13 +184,16 @@ def main():
         else:
             break
 
+    # Close all windows
+    cv2.destroyAllWindows()
+
 
 def getModel():
     '''
-    returns a model with a VGG16 base model and custom classification layers
+    returns a model with a InceptionV3 base model and custom classification layers
     '''
-    # Load a pre-trained VGG16 model without the top classification layer
-    base_model = tf.keras.applications.VGG16(
+    # Load a pre-trained InceptionV3 model without the top classification layer
+    base_model = tf.keras.applications.InceptionV3(
         weights='imagenet', include_top=False, input_shape=(image_width, image_height, 3))
 
     # Freeze the layers of the pre-trained model
@@ -197,17 +201,22 @@ def getModel():
         layer.trainable = False
 
     # Add custom classification layers on top of the pre-trained model
-    x = GlobalAveragePooling2D()(base_model.output)  # apply global average pooling to reduce the spatial dimensions of the feature maps
-    x = Dense(1024, activation='leaky_relu', kernel_regularizer=l2(0.01))(x)  # apply a linear transformation to the feature vector and apply the ReLU activation function
-    x = BatchNormalization()(x)  # apply batch normalization to improve the stability and speed of training
-    x = Dropout(0.3)(x)  # apply dropout regularization to prevent overfitting to the training data
-    prediction = Dense(1, activation='sigmoid')(x)  # apply a final linear transformation and sigmoid activation function to produce the final output of the model
+    # apply global average pooling to reduce the spatial dimensions of the feature maps
+    x = GlobalAveragePooling2D()(base_model.output)
+    # apply a fully-connected layer with 1024 hidden units and leaky ReLU activation
+    x = Dense(1024, activation='leaky_relu', kernel_regularizer=l2(0.01))(x)
+    # apply batch normalization to standardize the activations of the previous layer
+    x = BatchNormalization()(x)
+    # apply dropout regularization to prevent overfitting to the training data
+    x = Dropout(0.5)(x)
+    # apply a final linear transformation and sigmoid activation function to produce the final output of the model
+    prediction = Dense(1, activation='sigmoid')(x)
 
     # Create the final model
     model = Model(inputs=base_model.input, outputs=prediction)
 
     # Use the Adam optimizer with an initial learning rate
-    initial_learning_rate = 0.001 # default learning rate
+    initial_learning_rate = 0.001  # default learning rate
     if platform.machine() in ['arm64', 'arm64e']:
         optimizer = tf.keras.optimizers.legacy.Adam(
             learning_rate=initial_learning_rate)
@@ -250,11 +259,9 @@ def showImagePrediction(image_path, prediction, confidence, correct=True):
     if prediction == 'hotdog':
         label = f"{prediction} ({confidence:.2f})"
         bg_color = (0, 255, 0)  # green background for hotdog prediction
-        symbol = '✓' if correct else 'X'  # checkmark for correct prediction, X for incorrect prediction
     else:
         label = f"{prediction} ({1 - confidence:.2f})"
         bg_color = (0, 0, 255)  # red background for not hotdog prediction
-        symbol = 'X' if correct else '✓'  # X for incorrect prediction, checkmark for correct prediction
 
     # Set the font color to white
     font_color = (255, 255, 255)
@@ -263,28 +270,43 @@ def showImagePrediction(image_path, prediction, confidence, correct=True):
     img_height, img_width, _ = img.shape
     label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
 
-    # Calculate the position of the prediction label
-    label_x = 10
-    label_y = 10 + label_size[1]
+    # Calculate the position of the label
+    label_x = (img_width - label_size[0]) // 2
+    label_y = img_height + label_size[1] + 20
 
-    # Resize the prediction label to match the width of the image
-    if label_size[0] > img_width - 20:
-        scale_factor = (img_width - 20) / label_size[0]
-        label_size = (int(label_size[0] * scale_factor),
-                      int(label_size[1] * scale_factor))
-    else:
-        scale_factor = 1
+    # Create a new image with the same width and a taller height to accommodate the label
+    new_img = np.zeros((label_y, img_width, 3), np.uint8)
+    new_img[:img_height, :] = img
 
-    # Add the prediction label to the image with a colored background and symbol
-    cv2.rectangle(img, (label_x, label_y - label_size[1]),
-                  (label_x + label_size[0], label_y), bg_color, -1)
-    cv2.putText(img, label, (label_x, label_y),
-                cv2.FONT_HERSHEY_SIMPLEX, scale_factor, font_color, 2)
-    cv2.putText(img, symbol, (label_x + label_size[0] - 30, label_y - 10),
+    # Draw the background rectangle for the label
+    cv2.rectangle(new_img, (0, img_height),
+                  (img_width, label_y), bg_color, -1)
+    
+    # Draw the background rectangle for the checkmark or X
+    cv2.circle(new_img, (img_width // 2, img_height), 30, bg_color, -1)
+
+    # Draw the prediction label
+    cv2.putText(new_img, label, (label_x, img_height + label_size[1] + 10),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 2)
 
+    # Calculate the position of the checkmark or X
+    symbol_x = img_width // 2 - 15
+    symbol_y = img_height - 15
+    
+    # Draw the checkmark or X
+    if correct:
+        # Draw a checkmark using lines
+        cv2.line(new_img, (symbol_x, symbol_y + 10), (symbol_x + 10, symbol_y + 20), font_color, 3)
+        cv2.line(new_img, (symbol_x + 10, symbol_y + 20), (symbol_x + 25, symbol_y - 5), font_color, 3)
+    else:
+        # Draw an "X" using lines
+        cv2.line(new_img, (symbol_x + 5, symbol_y), (symbol_x + 25, symbol_y + 20), font_color, 3)
+        cv2.line(new_img, (symbol_x + 5, symbol_y + 20), (symbol_x + 25, symbol_y), font_color, 3)
+
+
     # Show the image
-    cv2.imshow("Hotdog or Not Hotdog", img)
+    cv2.imshow("Hotdog or Not Hotdog", new_img)
+
 
 
 if __name__ == "__main__":
