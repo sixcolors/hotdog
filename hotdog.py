@@ -79,7 +79,7 @@ def main():
         print("Model architecture visualization saved as 'model_architecture.png'")
 
         # Define the early stopping and model checkpoint callbacks
-        early_stopping = EarlyStopping(monitor='val_loss', patience=5)
+        early_stopping = EarlyStopping(monitor='val_loss', patience=3)
         model_checkpoint = ModelCheckpoint(
             'hotdog_checkpoint.h5', save_best_only=True)
         lr_scheduler = LearningRateScheduler(lr_schedule)
@@ -197,25 +197,25 @@ def getModel():
         layer.trainable = False
 
     # Add custom classification layers on top of the pre-trained model
-    x = GlobalAveragePooling2D()(base_model.output)
-    x = Dense(128, activation='relu', kernel_regularizer=l2(0.01))(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.5)(x)
-    x = Dense(64, activation='relu', kernel_regularizer=l2(0.01))(x)
-    x = BatchNormalization()(x)
-    x = Dropout(0.5)(x)
-    prediction = Dense(1, activation='sigmoid')(x)
+    x = GlobalAveragePooling2D()(base_model.output)  # apply global average pooling to reduce the spatial dimensions of the feature maps
+    x = Dense(128, activation='relu', kernel_regularizer=l2(0.01))(x)  # apply a linear transformation to the feature vector and apply the ReLU activation function
+    x = BatchNormalization()(x)  # apply batch normalization to improve the stability and speed of training
+    x = Dropout(0.5)(x)  # apply dropout regularization to prevent overfitting to the training data
+    x = Dense(64, activation='relu', kernel_regularizer=l2(0.01))(x)  # apply another linear transformation to the feature vector and apply the ReLU activation function
+    x = BatchNormalization()(x)  # apply batch normalization again
+    x = Dropout(0.5)(x)  # apply dropout regularization again
+    prediction = Dense(1, activation='sigmoid')(x)  # apply a final linear transformation and sigmoid activation function to produce the final output of the model
 
     # Create the final model
     model = Model(inputs=base_model.input, outputs=prediction)
 
-    # Use the RMSprop optimizer with an initial learning rate
-    initial_learning_rate = 0.001
+    # Use the Adam optimizer with an initial learning rate
+    initial_learning_rate = 0.001 # default learning rate
     if platform.machine() in ['arm64', 'arm64e']:
-        optimizer = tf.keras.optimizers.legacy.RMSprop(
+        optimizer = tf.keras.optimizers.legacy.Adam(
             learning_rate=initial_learning_rate)
     else:
-        optimizer = tf.keras.optimizers.RMSprop(
+        optimizer = tf.keras.optimizers.Adam(
             learning_rate=initial_learning_rate)
 
     # Compile the model with binary cross-entropy loss and accuracy metric
