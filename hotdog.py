@@ -147,6 +147,9 @@ def main():
                 images[index][0], target_size=(image_width, image_height))
         except:
             print(f'Error loading image {images[index][0]}')
+            images.pop(index)
+            if index >= len(images):
+                index = 0
             continue
 
         # Convert the image to a numpy array
