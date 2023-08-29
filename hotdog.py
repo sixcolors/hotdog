@@ -90,6 +90,7 @@ def main():
             # Load the weights from the checkpoint file
             print("Loading weights from 'hotdog_checkpoint.h5'")
             model.load_weights('hotdog_checkpoint.h5')
+            print("Weights loaded successfully")
 
         # Train the model
         model.fit(
@@ -141,8 +142,12 @@ def main():
 
     while True:
         # Load the image
-        test_image = load_img(
-            images[index][0], target_size=(image_width, image_height))
+        try:
+            test_image = load_img(
+                images[index][0], target_size=(image_width, image_height))
+        except:
+            print(f'Error loading image {images[index][0]}')
+            continue
 
         # Convert the image to a numpy array
         test_image = img_to_array(test_image)
