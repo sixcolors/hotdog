@@ -45,5 +45,3 @@ This project is built on the foundation of deep learning, computer vision, and t
 
 ### Disclaimer:
 This project is for educational purposes and entertainment, showcasing the capabilities of image classification using deep learning. It's not intended for production use and may not be perfect in classifying all images accurately.
-
-Feel free to modify and personalize the description according to your project's goals and nuances.
