@@ -203,7 +203,7 @@ def getModel():
     returns a model with a InceptionV3 base model and custom classification layers
     '''
     # Load a pre-trained InceptionV3 model without the top classification layer
-    base_model = tf.keras.applications.InceptionV3(
+    base_model = InceptionV3(
         weights='imagenet', include_top=False, input_shape=(image_width, image_height, 3))
 
     # Freeze the layers of the pre-trained model
