@@ -225,13 +225,13 @@ def getModel():
     # Create the final model
     model = Model(inputs=base_model.input, outputs=prediction)
 
-    # Use the Adam optimizer with an initial learning rate
+    # Use the RMSprop optimizer with an initial learning rate
     initial_learning_rate = 0.001  # default learning rate
     if platform.machine() in ['arm64', 'arm64e']:
-        optimizer = tf.keras.optimizers.legacy.Adam(
+        optimizer = tf.keras.optimizers.legacy.RMSprop(
             learning_rate=initial_learning_rate)
     else:
-        optimizer = tf.keras.optimizers.Adam(
+        optimizer = tf.keras.optimizers.RMSprop(
             learning_rate=initial_learning_rate)
 
     # Compile the model with binary cross-entropy loss and accuracy metric
