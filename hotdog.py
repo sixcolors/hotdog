@@ -6,7 +6,6 @@ import random
 import cv2
 import numpy as np
 import tensorflow as tf
-from keras.preprocessing import image
 from keras.utils import load_img, img_to_array
 from keras.layers import (BatchNormalization, Dense,
                           Dropout, GlobalAveragePooling2D)
