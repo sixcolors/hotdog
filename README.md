@@ -1,7 +1,7 @@
 ## Hotdog or Not Hotdog Classifier
 
 ### Description:
-The "Hotdog or Not Hotdog Classifier" project is an image classification application that uses deep learning to determine whether an image contains a hotdog or not. It's inspired by the famous "Hotdog or Not Hotdog" app from the TV show Silicon Valley. The project is built using Python and the TensorFlow framework. It employs a Convolutional Neural Network (CNN) architecture to learn and recognize patterns in images, making it capable of distinguishing between hotdog and non-hotdog images.
+The "Hotdog or Not Hotdog Classifier" project is an image classification application that uses deep learning to determine whether an image contains a hotdog or not. It's inspired by the famous "SeeFood" app from the TV show Silicon Valley. The project is built using Python and the TensorFlow framework. It employs a Convolutional Neural Network (CNN) architecture to learn and recognize patterns in images, making it capable of distinguishing between hotdog and non-hotdog images.
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/vIci3C4JkL0/0.jpg)](https://www.youtube.com/watch?v=vIci3C4JkL0)
 
