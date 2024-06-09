@@ -19,15 +19,44 @@ The "Hotdog or Not Hotdog Classifier" project is an image classification applica
 11. Model Saving: Trained models are saved in the Hierarchical Data Format (HDF5) format for future use and deployment.
 12. Flexibility: The project includes customizable parameters such as image dimensions, batch size, and model architecture.
 
+### Requirements:
+- Python 3.11
+- Anaconda or Miniconda
+- TensorFlow (>=2.0, <3.0)
+- NumPy (>=1.0, <2.0)
+- Matplotlib (>=3.0, <4.0)
+- OpenCV (>=4.0, <5.0)
+- PyDot (>=1.0, <2.0)
+
+Python packages can be installed using the `requirements.txt` file provided in the repository.
+
 ### Getting Started:
 
 - Clone the repository to your local machine.
-- Grab the Dataset: https://www.kaggle.com/datasets/thedatasith/hotdog-nothotdog
-    - Create a folder named "dataset"
-    - Download the dataset and extract the images
+```bash
+git clone https://github.com/sixcolors/hotdog.git
+```
+- Navigate to the project directory.
+```bash
+cd hotdog
+```
+- Grab the Dataset: 
+    - Create a folder named "dataset" in the project directory.
+    - Download the dataset (https://www.kaggle.com/datasets/thedatasith/hotdog-nothotdog) and extract the images
     - Move the "test" and "train" folders to the "dataset" folder.
+- Create a virtual environment and activate it.
+```bash
+conda create -n hotdog_classifier python=3.11
+conda activate hotdog_classifier
+```
 - Install the required dependencies listed in the requirements.txt file.
-- Run the main script to train the model or use a pre-trained model.
+```bash
+conda install --file requirements.txt
+```
+- Run the main script to train the model or use the optional command line argument to load a pre-trained model.
+```bash
+python main.py <path_to_model>
+```
 - Interact with the model using the OpenCV-based interface to test random images.
     - Press "d" to view the next image.
     - Press "a" to view the previous image.
