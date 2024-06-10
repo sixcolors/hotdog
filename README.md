@@ -63,9 +63,9 @@ conda install --file requirements.txt
 ```
 
 ## Usage
-1. Run the main script to train the model or use the optional command line argument to load a pre-trained model.
+1. Run the `hotdog` script to train the model or use the optional command line argument to load a pre-trained model.
 ```bash
-python main.py <path_to_model>
+python hotdog.py <path_to_model>
 ```
 2. Interact with the model using the OpenCV-based interface to test random images.
     - Press "d" to view the next image.
