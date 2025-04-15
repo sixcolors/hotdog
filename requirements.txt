@@ -2,4 +2,4 @@ tensorflow>=2.0,<3.0
 numpy>=1.0,<2.0
 matplotlib>=3.0,<4.0
 opencv>=4.0,<5.0
-pydot>=1.0,<2.0
+pydot>=1.0,<4.0

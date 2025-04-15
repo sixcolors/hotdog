@@ -141,6 +141,13 @@ def main():
     # Initialize the index to 0
     index = 0
 
+    # Print user controls
+    print("===== Usage Instructions =====")
+    print("Press 'a' to view the previous image.")
+    print("Press 'd' to view the next image.")
+    print("Press any other key to exit.")
+    print("================================\n")
+
     while True:
         # Load the image
         try:
